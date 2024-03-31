@@ -72,7 +72,7 @@ class $modify(LevelInfoLayer) {
 	bool init(GJGameLevel * level, bool p1) {
 		if (!LevelInfoLayer::init(level, p1)) return false;
 
-		if (!Mod::get()->getSettingValue<bool>("enabled")) return;
+		if (!Mod::get()->getSettingValue<bool>("enabled")) return true;
 
 		// positions stolen from better info so it looks similar
 		auto label = m_lengthLabel;
