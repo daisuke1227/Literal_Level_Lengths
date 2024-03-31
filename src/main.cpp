@@ -53,11 +53,12 @@ std::string getLengthString(GJGameLevel* level) {
 		float convertedLength = length * multipliers[unit::get().currentUnit];
 		if (convertedLength != static_cast<int>(convertedLength)) {
 			std::stringstream ss;
-			ss << std::fixed << std::setprecision(2) <<convertedLength;
+			ss << std::fixed << std::setprecision(2) << convertedLength;
 			str = ss.str();
-		} else 
+		}
+		else
 			str = std::to_string(static_cast<int>(convertedLength));
-		
+
 		str += units[unit::get().currentUnit];
 	}
 
@@ -70,6 +71,9 @@ class $modify(LevelInfoLayer) {
 
 	bool init(GJGameLevel * level, bool p1) {
 		if (!LevelInfoLayer::init(level, p1)) return false;
+
+		if (!Mod::get()->getSettingValue<bool>("enabled")) return;
+
 		// positions stolen from better info so it looks similar
 		auto label = m_lengthLabel;
 		if (label) {
@@ -87,6 +91,9 @@ class $modify(LevelInfoLayer) {
 
 	void levelDownloadFinished(GJGameLevel * level) {
 		LevelInfoLayer::levelDownloadFinished(level);
+
+		if (!Mod::get()->getSettingValue<bool>("enabled")) return;
+
 		if (m_fields->literalLengthLabel)
 			m_fields->literalLengthLabel->setString(getLengthString(level).c_str());
 	}
