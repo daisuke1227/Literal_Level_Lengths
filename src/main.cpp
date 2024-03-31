@@ -94,6 +94,8 @@ class $modify(LevelInfoLayer) {
 
 		if (!Mod::get()->getSettingValue<bool>("enabled")) return;
 
+		if (sessionLengths.contains(level->m_levelID.value())) sessionLengths.erase(level->m_levelID.value());
+
 		if (m_fields->literalLengthLabel)
 			m_fields->literalLengthLabel->setString(getLengthString(level).c_str());
 	}
