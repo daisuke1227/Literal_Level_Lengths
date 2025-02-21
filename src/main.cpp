@@ -1,18 +1,23 @@
-
-#include <Geode/Geode.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
-#include "custom_setting.hpp"
 #include <vector>
 #include <regex>
 
 using namespace geode::prelude;
 
-std::map<int, float> sessionLengths;
+std::map<int, double> sessionLengths = {};
+const std::unordered_map<std::string, double> unitToMultiplier = {
+	{"m", 1.0},
+	{"km", 0.001},
+	{"ft", 3.281},
+	{"in", 39.37},
+	{"yd", 1.093},
+	{"mi", 0.000621371}
+};
 
-float getMaxPos(GJGameLevel* level) {
-	float max = 0;
+double getMaxPos(GJGameLevel* level) {
+	double max = 0;
 
-	std::string decompString = ZipUtils::decompressString(level->m_levelString.c_str(), true, 0);
+	std::string decompString = ZipUtils::decompressString(level->m_levelString, true, 0);
 	std::regex pattern("[^;]+");
 	std::smatch matches;
 
@@ -20,7 +25,7 @@ float getMaxPos(GJGameLevel* level) {
 	++it;
 	auto end = std::sregex_iterator();
 	for (; it != end; ++it) {
-		std::smatch match = *it;
+		const std::smatch& match = *it;
 		std::vector<std::string> elements;
 
 		std::stringstream ss(match.str());
@@ -30,12 +35,10 @@ float getMaxPos(GJGameLevel* level) {
 			elements.push_back(element);
 		}
 
-		if (3 < elements.size()) {
-			if (std::stoi(elements[3]) > max)
-				max = std::stoi(elements[3]);
-		}
+		if (3 < elements.size() && utils::numFromString<double>(elements[3]).unwrapOr(-1.0) > max)
+			max = utils::numFromString<double>(elements[3]).unwrapOr(-1.0);
 	}
-	float length = (max + 15) / 30.f;
+	double length = (max + 15.0) / 30.0;
 	sessionLengths[level->m_levelID.value()] = length;
 
 	return length;
@@ -44,68 +47,62 @@ float getMaxPos(GJGameLevel* level) {
 std::string getLengthString(GJGameLevel* level) {
 	std::string str = "NA";
 
-	bool savedPreviously = sessionLengths.contains(level->m_levelID.value());
-	bool levelDownloaded = static_cast<std::string>(level->m_levelString).length() > 0;
+	const bool savedPreviously = sessionLengths.contains(level->m_levelID.value());
+	const bool levelDownloaded = !static_cast<std::string>(level->m_levelString).empty();
+	const bool stringIsInMap = unitToMultiplier.contains(Mod::get()->getSettingValue<std::string>("unitAsString"));
+	const std::string& unitAsString = Mod::get()->getSettingValue<std::string>("unitAsString");
+	const double multiplier = stringIsInMap ? unitToMultiplier.find(unitAsString)->second : 1.0;
 
-	float length = savedPreviously ? sessionLengths[level->m_levelID.value()] : (levelDownloaded ? getMaxPos(level) : 0.f);
+	const double length = savedPreviously ? sessionLengths[level->m_levelID.value()] : (levelDownloaded ? getMaxPos(level) : 0.f);
 
 	if ((levelDownloaded && !savedPreviously) || savedPreviously) {
-		float convertedLength = length * multipliers[unit::get().currentUnit];
+		double convertedLength = length * multiplier;
 		if (convertedLength != static_cast<int>(convertedLength)) {
 			std::stringstream ss;
 			ss << std::fixed << std::setprecision(2) << convertedLength;
 			str = ss.str();
-		}
-		else
-			str = std::to_string(static_cast<int>(convertedLength));
+		} else str = std::to_string(static_cast<int>(convertedLength));
 
-		str += units[unit::get().currentUnit];
+		str.append(stringIsInMap ? unitAsString : "m");
 	}
 
 	return str;
 }
 
 class $modify(LevelInfoLayer) {
-	int m_maxPosX = 0;
-	CCLabelBMFont* literalLengthLabel = nullptr;
-
+	struct Fields {
+		int m_maxPosX = 0;
+		CCLabelBMFont* literalLengthLabel = nullptr;
+	};
 	bool init(GJGameLevel * level, bool p1) {
 		if (!LevelInfoLayer::init(level, p1)) return false;
 
 		if (!Mod::get()->getSettingValue<bool>("enabled")) return true;
 
 		// positions stolen from better info so it looks similar
-		auto label = m_lengthLabel;
-		if (label) {
-			m_fields->literalLengthLabel = CCLabelBMFont::create(getLengthString(level).c_str(), "bigFont.fnt");
-			m_fields->literalLengthLabel->setPosition({ label->getPositionX() + 1, label->getPositionY() - (Loader::get()->isModLoaded("cvolton.betterinfo") ? 11.f : 2.f) });
-			m_fields->literalLengthLabel->setAnchorPoint({ 0,1 });
-			m_fields->literalLengthLabel->setScale(0.325f);
+		if (!m_lengthLabel) return true;
+		const auto fields = m_fields.self();
 
-			addChild(m_fields->literalLengthLabel);
-			if (!Loader::get()->isModLoaded("cvolton.betterinfo")) label->setPositionY(label->getPositionY() + 6.f);
+		fields->literalLengthLabel = CCLabelBMFont::create(getLengthString(level).c_str(), "bigFont.fnt");
+		fields->literalLengthLabel->setPosition({ m_lengthLabel->getPositionX() + 1, m_lengthLabel->getPositionY() - (Loader::get()->isModLoaded("cvolton.betterinfo") ? 11.f : 2.f) });
+		fields->literalLengthLabel->setAnchorPoint({ 0,1 });
+		fields->literalLengthLabel->setScale(0.325f);
 
-		}
+		this->addChild(fields->literalLengthLabel);
+		if (!Loader::get()->isModLoaded("cvolton.betterinfo")) m_lengthLabel->setPositionY(m_lengthLabel->getPositionY() + 6.f);
+		
 		return true;
 	}
-
 	void levelDownloadFinished(GJGameLevel * level) {
 		LevelInfoLayer::levelDownloadFinished(level);
 
 		if (!Mod::get()->getSettingValue<bool>("enabled")) return;
+		const auto fields = m_fields.self();
 
 		if (sessionLengths.contains(level->m_levelID.value())) sessionLengths.erase(level->m_levelID.value());
 
-		if (m_fields->literalLengthLabel)
-			m_fields->literalLengthLabel->setString(getLengthString(level).c_str());
+		if (!fields->literalLengthLabel) return;
+		
+		fields->literalLengthLabel->setString(getLengthString(level).c_str());
 	}
-
 };
-
-$execute{
-	unit::get().currentUnit = Mod::get()->getSavedValue<int64_t>("unit");
-}
-
-$on_mod(Loaded) {
-	Mod::get()->addCustomSetting<ButtonCustomSettingValue>("unit", "none");
-}

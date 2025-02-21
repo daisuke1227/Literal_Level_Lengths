@@ -5,7 +5,7 @@
 		"mac": "2.2074",
 		"android": "2.2074"
 	},
-	"version": "v1.0.0",
+	"version": "v1.0.1",
 	"settings": {
 		"enabled": {
 			"name": "Enabled",
@@ -13,8 +13,13 @@
 			"type": "bool",
 			"default": true
 		},
-		"unit": {
-			"type": "custom"
+		"unitAsString": {
+			"name": "Unit",
+			"type": "string",
+			"default": "m",
+			"one-of": [
+				"m", "km", "ft", "in", "yd", "mi"
+			]
 		}
 	},
 	"id": "zilko.literal_level_lengths",
