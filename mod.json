@@ -1,10 +1,11 @@
 {
-	"geode": "2.0.0-beta.23",
+	"geode": "4.0.1",
 	"gd": {
-		"win": "2.204",
-		"android": "2.205"
+		"win": "2.2074",
+		"mac": "2.2074",
+		"android": "2.2074"
 	},
-	"version": "v1.0.0",
+	"version": "v1.0.1",
 	"settings": {
 		"enabled": {
 			"name": "Enabled",
@@ -12,8 +13,13 @@
 			"type": "bool",
 			"default": true
 		},
-		"unit": {
-			"type": "custom"
+		"unitAsString": {
+			"name": "Unit",
+			"type": "string",
+			"default": "m",
+			"one-of": [
+				"m", "km", "ft", "in", "yd", "mi"
+			]
 		}
 	},
 	"id": "zilko.literal_level_lengths",

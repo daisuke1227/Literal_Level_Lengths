@@ -1,5 +1,3 @@
-build/
-
 # Prerequisites
 *.d
 
@@ -58,3 +56,4 @@ build-*/
 
 # Visual Studio
 .vs/
+/cmake-*/
