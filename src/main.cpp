@@ -90,7 +90,7 @@ class $modify(LevelInfoLayer) {
 
 		this->addChild(fields->literalLengthLabel);
 		fields->literalLengthLabel->setID("literal-length-label"_spr);
-		if (level->m_starts.value() == 0 && isBetterInfo) fields->literalLengthLabel->setAnchorPoint({0.f, 0.f});
+		if (level->m_stars.value() == 0 && isBetterInfo) fields->literalLengthLabel->setAnchorPoint({0.f, 0.f});
 		
 		return true;
 	}
