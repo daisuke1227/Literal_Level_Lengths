@@ -13,6 +13,7 @@ const std::unordered_map<std::string, double> unitToMultiplier = {
 	{"yd", 1.093},
 	{"mi", 0.000621371}
 };
+bool isBetterInfo = false;
 
 double getMaxPos(GJGameLevel* level) {
 	double max = 0;
@@ -71,38 +72,39 @@ std::string getLengthString(GJGameLevel* level) {
 
 class $modify(LevelInfoLayer) {
 	struct Fields {
-		int m_maxPosX = 0;
 		CCLabelBMFont* literalLengthLabel = nullptr;
 	};
-	bool init(GJGameLevel * level, bool p1) {
+	bool init(GJGameLevel* level, bool p1) {
 		if (!LevelInfoLayer::init(level, p1)) return false;
 
 		if (!Mod::get()->getSettingValue<bool>("enabled")) return true;
 
 		// positions stolen from better info so it looks similar
-		if (!m_lengthLabel) return true;
+		if (!m_exactLengthLabel) return true;
 		const auto fields = m_fields.self();
 
 		fields->literalLengthLabel = CCLabelBMFont::create(getLengthString(level).c_str(), "bigFont.fnt");
-		fields->literalLengthLabel->setPosition({ m_lengthLabel->getPositionX() + 1, m_lengthLabel->getPositionY() - (Loader::get()->isModLoaded("cvolton.betterinfo") ? 11.f : 2.f) });
-		fields->literalLengthLabel->setAnchorPoint({ 0,1 });
+		fields->literalLengthLabel->setPosition({ m_exactLengthLabel->getPositionX(), m_exactLengthLabel->getPositionY() - ((m_level->isPlatformer() || isBetterInfo ? 11.f : 0.f)) });
+		fields->literalLengthLabel->setAnchorPoint({0, .5f});
 		fields->literalLengthLabel->setScale(0.325f);
 
 		this->addChild(fields->literalLengthLabel);
-		if (!Loader::get()->isModLoaded("cvolton.betterinfo")) m_lengthLabel->setPositionY(m_lengthLabel->getPositionY() + 6.f);
+		fields->literalLengthLabel->setID("literal-length-label"_spr);
+		if (level->m_stars.value() == 0 && isBetterInfo) fields->literalLengthLabel->setAnchorPoint({0.f, 0.f});
 		
 		return true;
 	}
-	void levelDownloadFinished(GJGameLevel * level) {
+	void levelDownloadFinished(GJGameLevel* level) {
 		LevelInfoLayer::levelDownloadFinished(level);
 
 		if (!Mod::get()->getSettingValue<bool>("enabled")) return;
-		const auto fields = m_fields.self();
-
 		if (sessionLengths.contains(level->m_levelID.value())) sessionLengths.erase(level->m_levelID.value());
 
-		if (!fields->literalLengthLabel) return;
-		
-		fields->literalLengthLabel->setString(getLengthString(level).c_str());
+		const auto fields = m_fields.self();
+		if (fields->literalLengthLabel) return fields->literalLengthLabel->setString(getLengthString(level).c_str());
 	}
 };
+
+$on_mod(Loaded) {
+	isBetterInfo = Loader::get()->isModLoaded("cvolton.betterinfo");
+}
