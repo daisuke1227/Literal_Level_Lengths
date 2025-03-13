@@ -13,6 +13,7 @@ const std::unordered_map<std::string, double> unitToMultiplier = {
 	{"yd", 1.093},
 	{"mi", 0.000621371}
 };
+bool isBetterInfo = false;
 
 double getMaxPos(GJGameLevel* level) {
 	double max = 0;
@@ -83,13 +84,13 @@ class $modify(LevelInfoLayer) {
 		const auto fields = m_fields.self();
 
 		fields->literalLengthLabel = CCLabelBMFont::create(getLengthString(level).c_str(), "bigFont.fnt");
-		fields->literalLengthLabel->setPosition({ m_exactLengthLabel->getPositionX(), m_exactLengthLabel->getPositionY() - ((m_level->isPlatformer() || Loader::get()->isModLoaded("cvolton.betterinfo") ? 11.f : 0.f)) });
+		fields->literalLengthLabel->setPosition({ m_exactLengthLabel->getPositionX(), m_exactLengthLabel->getPositionY() - ((m_level->isPlatformer() || isBetterInfo ? 11.f : 0.f)) });
 		fields->literalLengthLabel->setAnchorPoint({0, .5f});
 		fields->literalLengthLabel->setScale(0.325f);
 
 		this->addChild(fields->literalLengthLabel);
 		fields->literalLengthLabel->setID("literal-length-label"_spr);
-		if (level->m_starts.value() == 0) fields->literalLengthLabel->setAnchorPointY(0.f);
+		if (level->m_starts.value() == 0 && isBetterInfo) fields->literalLengthLabel->setAnchorPointY(0.f);
 		
 		return true;
 	}
@@ -103,3 +104,7 @@ class $modify(LevelInfoLayer) {
 		if (fields->literalLengthLabel) return fields->literalLengthLabel->setString(getLengthString(level).c_str());
 	}
 };
+
+$on_mod(Loaded) {
+	isBetterInfo = Loader::get()->isModLoaded("cvolton.betterinfo");
+}
