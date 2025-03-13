@@ -73,7 +73,7 @@ class $modify(LevelInfoLayer) {
 	struct Fields {
 		CCLabelBMFont* literalLengthLabel = nullptr;
 	};
-	bool init(GJGameLevel * level, bool p1) {
+	bool init(GJGameLevel* level, bool p1) {
 		if (!LevelInfoLayer::init(level, p1)) return false;
 
 		if (!Mod::get()->getSettingValue<bool>("enabled")) return true;
@@ -89,10 +89,11 @@ class $modify(LevelInfoLayer) {
 
 		this->addChild(fields->literalLengthLabel);
 		fields->literalLengthLabel->setID("literal-length-label"_spr);
+		if (level->m_starts.value() == 0) fields->literalLengthLabel->setAnchorPointY(0.f);
 		
 		return true;
 	}
-	void levelDownloadFinished(GJGameLevel * level) {
+	void levelDownloadFinished(GJGameLevel* level) {
 		LevelInfoLayer::levelDownloadFinished(level);
 
 		if (!Mod::get()->getSettingValue<bool>("enabled")) return;
