@@ -83,7 +83,7 @@ class $modify(LevelInfoLayer) {
 		const auto fields = m_fields.self();
 
 		fields->literalLengthLabel = CCLabelBMFont::create(getLengthString(level).c_str(), "bigFont.fnt");
-		fields->literalLengthLabel->setPosition({ m_exactLengthLabel->getPositionX(), m_exactLengthLabel->getPositionY() - ((m_level->isPlatformer() || Loader::get()->isModLoaded("cvolton.betterinfo") ? 2.f : 11.f)) });
+		fields->literalLengthLabel->setPosition({ m_exactLengthLabel->getPositionX(), m_exactLengthLabel->getPositionY() - ((m_level->isPlatformer() || Loader::get()->isModLoaded("cvolton.betterinfo") ? 11.f : 0.f)) });
 		fields->literalLengthLabel->setAnchorPoint({0, .5f});
 		fields->literalLengthLabel->setScale(0.325f);
 
