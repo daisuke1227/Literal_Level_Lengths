@@ -104,6 +104,7 @@ class $modify(LevelInfoLayer) {
 		if (!fields->literalLengthLabel) return;
 		const std::string& lengthString = getLengthString(level);
 		if (!m_exactLengthLabel->isVisible()) {
+			m_exactLengthLabel->setVisible(true);
 			m_exactLengthLabel->setString(lengthString.c_str());
 			fields->literalLengthLabel->removeMeAndCleanup();
 			return fields->literalLengthLabel->release();
