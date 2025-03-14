@@ -102,8 +102,13 @@ class $modify(LevelInfoLayer) {
 
 		const auto fields = m_fields.self();
 		if (!fields->literalLengthLabel) return;
-		fields->literalLengthLabel->setString(getLengthString(level).c_str());
-		if (!m_exactLengthLabel->isVisible()) fields->literalLengthLabel->setPositionY(m_exactLengthLabel->getPositionY());
+		const std::string& lengthString = getLengthString(level);
+		if (!m_exactLengthLabel->isVisible()) {
+			m_exactLengthLabel->setString(lengthString.c_str());
+			fields->literalLengthLabel->removeMeAndCleanup();
+			return fields->literalLengthLabel->release();
+		}
+		fields->literalLengthLabel->setString(lengthString.c_str());
 	}
 };
 
