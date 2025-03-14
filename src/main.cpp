@@ -87,7 +87,7 @@ class $modify(LevelInfoLayer) {
 		fields->literalLengthLabel->setPosition(m_exactLengthLabel->getPosition());
 		fields->literalLengthLabel->setAnchorPoint({0, .5f});
 		fields->literalLengthLabel->setScale(0.325f);
-		fields->literalLengthLabel->setPositionY(fields->literalLengthLabel->getPositionY() - m_exactLengthLabel->getContentHeight());
+		fields->literalLengthLabel->setPositionY(fields->literalLengthLabel->getPositionY() - (m_exactLengthLabel->getContentHeight() * m_exactLengthLabel->getScale()));
 
 		this->addChild(fields->literalLengthLabel);
 		fields->literalLengthLabel->setID("literal-length-label"_spr);
