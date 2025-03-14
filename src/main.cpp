@@ -89,6 +89,7 @@ class $modify(LevelInfoLayer) {
 		fields->literalLengthLabel->setScale(0.325f);
 		fields->literalLengthLabel->setPositionY(fields->literalLengthLabel->getPositionY() - (m_exactLengthLabel->getContentHeight() * m_exactLengthLabel->getScale()));
 		if (!level->isPlatformer()) fields->literalLengthLabel->setPositionY(fields->literalLengthLabel->getPositionY() + 6.f);
+		if (!m_exactLengthLabel->isVisible() && !isBetterInfo) fields->literalLengthLabel->setPositionY(m_exactLengthLabel->getPositionY());
 		this->addChild(fields->literalLengthLabel);
 		fields->literalLengthLabel->setID("literal-length-label"_spr);
 		
@@ -102,14 +103,7 @@ class $modify(LevelInfoLayer) {
 
 		const auto fields = m_fields.self();
 		if (!fields->literalLengthLabel) return;
-		const std::string& lengthString = getLengthString(level);
-		if (!m_exactLengthLabel->isVisible()) {
-			m_exactLengthLabel->setVisible(true);
-			m_exactLengthLabel->setString(lengthString.c_str());
-			fields->literalLengthLabel->removeMeAndCleanup();
-			return fields->literalLengthLabel->release();
-		}
-		fields->literalLengthLabel->setString(lengthString.c_str());
+		fields->literalLengthLabel->setString(getLengthString(level).c_str());
 	}
 };
 
