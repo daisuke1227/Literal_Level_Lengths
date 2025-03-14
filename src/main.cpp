@@ -88,7 +88,7 @@ class $modify(LevelInfoLayer) {
 		fields->literalLengthLabel->setAnchorPoint({0, .5f});
 		fields->literalLengthLabel->setScale(0.325f);
 		fields->literalLengthLabel->setPositionY(fields->literalLengthLabel->getPositionY() - (m_exactLengthLabel->getContentHeight() * m_exactLengthLabel->getScale()));
-
+		if (!level->isPlatformer()) fields->literalLengthLabel->setPositionY(fields->literalLengthLabel->getPositionY() + 6.f);
 		this->addChild(fields->literalLengthLabel);
 		fields->literalLengthLabel->setID("literal-length-label"_spr);
 		
@@ -97,11 +97,13 @@ class $modify(LevelInfoLayer) {
 	void levelDownloadFinished(GJGameLevel* level) {
 		LevelInfoLayer::levelDownloadFinished(level);
 
-		if (!Mod::get()->getSettingValue<bool>("enabled")) return;
+		if (!Mod::get()->getSettingValue<bool>("enabled") || !m_exactLengthLabel) return;
 		if (sessionLengths.contains(level->m_levelID.value())) sessionLengths.erase(level->m_levelID.value());
 
 		const auto fields = m_fields.self();
-		if (fields->literalLengthLabel) return fields->literalLengthLabel->setString(getLengthString(level).c_str());
+		if (!fields->literalLengthLabel) return;
+		fields->literalLengthLabel->setString(getLengthString(level).c_str());
+		if (!m_exactLengthLabel->isVisible()) fields->literalLengthLabel->setPositionY(m_exactLengthLabel->getPositionY());
 	}
 };
 
