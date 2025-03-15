@@ -1,11 +1,11 @@
 {
-	"geode": "4.0.1",
+	"geode": "4.2.0",
 	"gd": {
 		"win": "2.2074",
 		"mac": "2.2074",
 		"android": "2.2074"
 	},
-	"version": "v1.0.3",
+	"version": "v1.0.4",
 	"settings": {
 		"enabled": {
 			"name": "Enabled",
@@ -18,7 +18,7 @@
 			"type": "string",
 			"default": "m",
 			"one-of": [
-				"m", "km", "ft", "in", "yd", "mi"
+				"m", "km", "ft", "in", "yd", "mi", "nmi", "ch", "lea"
 			]
 		}
 	},

@@ -1,3 +1,10 @@
+# v1.0.4
+
+* Improved level length calculation speed.
+* Removed lagspike when opening level page.
+* Fixed label position bugs.
+* Added nautical mile, league, and chain distance units, whatever these are.
+
 # v1.0.3
 
 * vro
